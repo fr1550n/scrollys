@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO8859-1" ?>
+  <PBProject Version="1.0">
+    <Includes Main="Main.pba">
+      <Include0 Name="Main.pba" Visible="1" CursorCol="0" CursorLine="0"/>
+    </Includes>
+    <Files/>
+    <LibraryHighlighters/>
+    <Executable Name="Sine_Scrollers.exe" SplashTime="0" DebugMode="0"/>
+    <VersionInfo UseInfo="0" AutoInc="0"/>
+    <Screen Width="800" Heigth="600" Depth="0" Mode="2"/>
+    <Author Name="Kevin Picone"/>
+    <Dates Created="18-06-2006" Edited="16-09-2006"/>
+    <Watches/>
+    <Breakpoints/>
+    <Trace/>
+  </PBProject>
