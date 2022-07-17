@@ -1,0 +1,95 @@
+{
+  "main": {
+    "id": "9c5f2a6e93a51502",
+    "type": "split",
+    "children": [
+      {
+        "id": "7012f111ee09e06d",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "README.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a3ffc069b8e108ac",
+    "type": "split",
+    "children": [
+      {
+        "id": "8ffbe457390adef1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c544ff11d553c3fb",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "3f698569c0853d3f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "bf82cee17c4a945a",
+    "type": "split",
+    "children": [
+      {
+        "id": "aab61ae7077813ce",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3ec48a91e20fcb78",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "README.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "7012f111ee09e06d",
+  "lastOpenFiles": [
+    "README.md",
+    "8_bit+scrolly.md",
+    "8_bit_scrolly/font.png"
+  ]
+}
