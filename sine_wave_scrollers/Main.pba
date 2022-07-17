@@ -1,0 +1,284 @@
+; PROJECT : Sine_Scrollers
+; AUTHOR  : Kevin Picone
+; CREATED : 18/06/2006
+; EDITED  : 16/09/2006
+; ---------------------------------------------------------------------
+
+	; Clear the screen to BLACK (rgb(0,0,0) = black
+	Cls rgb(0,0,0)
+	Print "Loading Fonts.."
+	SYNC
+	
+	
+	; Cap the frame rate bellow 60. 
+	Setfps 60
+
+	screenvsync on
+	
+ ; load the Courier New font
+	Loadfont  "Courier New",1,32,0
+	MakeBitmapFont 1,$ff0000
+
+ ; load the Courier New font for out scroll text
+	Loadfont  "Courier New",2,80,0
+	MakeBitmapFont 2,$a080f0
+	SetFont 2
+
+; Set the Sine wave width
+	SineWaveWidth=32
+
+; calc the height the scroll buffer needs to be
+	ScrollHeight=GetTextHeight("Y")
+
+
+	; Create Scroll Text image 
+	ScrollBuffer=NewImage(800+(SineWaveWidth*2)+GetFontWidth(2),ScrollHeight)
+
+	; Create a second Scroll Text image for multi pass effects like combined sine X & Y 
+	ScrollBuffer2=NewImage(800+(SineWaveWidth*2)+GetFontWidth(2),ScrollHeight)
+	
+
+	; Create a second Scroll Text image for multi pass effects like combined sine X & Y 
+	ScrollBuffer3=NewImage(800+(SineWaveWidth*2)+GetFontWidth(2),GetScreenHeight())
+	
+
+	; Create an array to hold the Scroll text in charater form
+	Dim ScrollText(0)
+   Read_Text_To_Scroller_Array(ScrollText())
+	 
+
+
+	Do
+		Cls rgb(0,0,0)
+			; Update the Scroll Buffer
+			setfont 2
+			UpdateScroller(ScrollText(),ScrollBuffer)
+
+
+			; select What effect render 
+			Select Effect
+
+				; ------------------------------------------
+				case 0
+				; ------------------------------------------
+						; draw the scroll messagae
+						Drawimage ScrollBuffer,0,280,true
+						EffectName$="Standard Scroller"
+
+				; ------------------------------------------
+				case 1
+				; ------------------------------------------
+
+ 						Draw_XSine_Image(ScrollBuffer,0,280,SineWaveWidth)
+						EffectName$="Scroller with sine X distortion"
+
+				; ------------------------------------------
+				case 2
+				; ------------------------------------------
+
+						Draw_YSine_Image(ScrollBuffer,0,270,270)
+						EffectName$="Scroller with sine Y distortion"
+
+				; ------------------------------------------
+				case 3	
+				; ------------------------------------------
+						rendertoimage Scrollbuffer2
+						Draw_XSine_Image(ScrollBuffer,0,0,SineWaveWidth)
+
+						rendertoscreen
+						Draw_YSine_Image(ScrollBuffer2,0,270,270)
+						EffectName$="Scroller with combined X&Y distortion"
+
+				; ------------------------------------------
+				case 4
+				; ------------------------------------------
+
+						UpdateScroller(ScrollText(),ScrollBuffer)
+
+						rendertoimage Scrollbuffer3
+						Draw_YSine_Image(ScrollBuffer,0,270,270)
+
+						rendertoscreen
+						Draw_XSine_Image(ScrollBuffer3,0,0,SineWaveWidth)
+						EffectName$="Scroller with combined Y+postX distortion"
+
+
+				; ------------------------------------------
+				case 5
+				; ------------------------------------------
+
+						UpdateScroller(ScrollText(),ScrollBuffer)
+
+						rendertoimage Scrollbuffer2
+						Draw_XSine_Image(ScrollBuffer,0,0,SineWaveWidth)
+
+
+						rendertoimage Scrollbuffer3
+						Draw_YSine_Image(ScrollBuffer2,0,270,270)
+
+						rendertoscreen
+						Draw_XSine_Image(ScrollBuffer3,0,0,SineWaveWidth)
+						EffectName$="Scroller with combined preX+Y+postX distortion"
+
+
+			endselect
+
+
+
+			; check if the space key was pressed
+			if Spacekey() 
+				; if so, bump the scroll effect counter to the next effect				
+				Inc Effect
+				; if the counter is greater than 5 then reset it
+				If effect>5 then effect=0
+				; flush the keys so space doesn't re-register
+				flushkeys
+		
+				; clear the  
+				rendertoimage ScrollBuffer3
+				cls 0
+				rendertoscreen
+			endif
+
+			; set font #1
+			Setfont 1
+			; get the text position
+			x=getscreenwidth()/2
+			y=GetScreenheight()/2+200
+			; draw the curent demo effect + demo instructions
+			centertext x,y,EffectName$ 
+			centertext x,y+50,"Press Space"
+		Sync	
+	loop
+
+
+; ---------------------------------------------------------------------
+; Copy an Image width a X sine wave applied
+; ---------------------------------------------------------------------
+
+Function Draw_XSine_Image(ThisImage,Xpos,Ypos,XwaveRAdius)
+	Static BaseAngle# 
+
+	OutputBuffer=getsurface()
+
+	IW=GetImageWidth(ThisImage)
+	IH=GetImageheight(ThisImage)
+
+	For Angle#=BaseAngle# to Baseangle#+IH
+		X=SinRadius(Angle#,XwaveRadius)					
+		CopyStripH ThisImage,y,0,iw,OutPutBuffer,Xpos-XwaveRAdius+X,ypos 
+		inc Y		
+		inc Ypos
+	next
+	
+	BaseAngle#=wrapangle(BaseAngle#,0.5)
+	rendertoscreen
+EndFUnction
+
+
+
+
+; ---------------------------------------------------------------------
+;  Copy an Image with a Y sine wave applied
+; ---------------------------------------------------------------------
+
+Function Draw_YSine_Image(ThisImage,Xpos,Ypos,WaveRAdius)
+	Static BaseAngle# 
+
+	OutputBuffer=getsurface()
+
+	IW=GetImageWidth(ThisImage)
+	IH=GetImageheight(ThisImage)
+
+	Angle#=baseangle#
+	if iw>GetImageWidth(Outputbuffer) then iw=GetImageWidth(Outputbuffer)
+	For x=0 to iw-1
+		Y=SinRadius(Angle#,waveRadius)					
+		; to reduce the number of blits we copy 2 pixel wide strips
+		CopyRect ThisImage,x,0,x+2,ih,OutPutBuffer,Xpos,ypos+Y 
+		xpos=xpos+2
+		Angle#=wrapangle(Angle#,0.5)
+	next
+	
+	BaseAngle#=wrapangle(BaseAngle#,2)
+	rendertoscreen
+EndFUnction
+
+
+
+
+
+
+
+; ---------------------------------------------------------------------
+; Refresh Scroll Text/ Buffer
+; ---------------------------------------------------------------------
+
+Function UpdateScroller(ChrBuffer(),ScrollBuffer)
+	; use static variables to keep track of the displacement
+	Static PixelShifts,CurrentChr
+	CurrentSurface=getSurface()
+
+	; get the current fonts + width & height
+	ThisFont=GetCurrentFOnt()
+	FontWidth=GetFontWidth(ThisFont)
+	FontHeight=GetFontHeight(ThisFont)
+		
+	; Get the Scroll Buffers Width and Height
+	IW=GetImagewidth(ScrollBuffer)
+	IH=GetImageHeight(ScrollBuffer)
+
+
+	; Move the Scroll buffer 2 pixel to the left 
+	 CopyRect  ScrollBuffer,1,0,IW,IH,ScrollBuffer,0,0
+
+	 inc PixelShifts 
+	 if PixelShifts=>GetFontWidth(GetCurrentFont())
+	 	PixelShifts=0
+		
+		 rendertoimage scrollbuffer
+		; clear any left over pixels 
+			boxc iw-fontwidth,0,iw,ih,true,0
+		; draw a new character on the end of the scroll image buffer
+		  text iw-FontWidth,0,chr$(ChrBuffer(CurrentChr))
+
+		; bump the current character index
+		inc CurrentChr
+		; check if the current character index is inside the buonds
+		; of the Scroll text array
+		if CurrentChr=>GetArrayElements(Chrbuffer(),1)
+				CurrentChr=0
+		endif
+	 endif
+
+	; restore old render surface
+	RenderToImage 	CurrentSurface
+	
+EndFunction
+
+
+
+; ---------------------------------------------------------------------
+; Read the scroll text data into a array
+; ---------------------------------------------------------------------
+
+Function Read_Text_To_Scroller_Array(Buffer())
+	Dim buffer(0)	
+	repeat
+		Size=GetArrayElements(Buffer(),1)
+		t$=readdata$()
+		if t$<>""
+			redim Buffer(Size+Len(t$))
+			For c=1 to len(t$)
+					buffer(size+c-1)=mid(t$,c)
+			next								
+		endif
+	until t$=""	
+EndFUnction
+
+
+ data "Hello World... Here's some old skool scroll text" 
+ Data "......................."
+ data ""  ; end of scroll text
+
+
