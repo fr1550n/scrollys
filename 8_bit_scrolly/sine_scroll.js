@@ -37,7 +37,7 @@ function scroll() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     for (let n = 0; n < letters; n++) {
         log(`${new Date().toLocaleString('en-GB', { timeZone: 'UTC' })}: n=${n} position for character: ${String.fromCharCode(char[n]+97)} = ${x[n]}`);	  	  
-	let y = 100; //+ wiggle * Math.sin(n + counter / 6.28);
+	let y = 100 + wiggle * Math.sin(n + counter / 6.28);
         context.drawImage(bitmap, char[n] * fontWidth, 0, fontWidth, fontHeight, x[n], y, fontWidth, fontHeight);
          x[n]-=xScrollSpeed;
          if (x[n] < -fontWidth) {
